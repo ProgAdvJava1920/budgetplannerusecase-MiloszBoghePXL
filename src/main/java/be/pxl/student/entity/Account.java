@@ -1,5 +1,6 @@
 package be.pxl.student.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,12 @@ public class Account {
     private String IBAN;
     private String name;
     private List<Payment> payments;
+
+    public Account(String IBAN, String name, List<Payment> payments) {
+        this.IBAN = IBAN;
+        this.name = name;
+        this.payments = payments;
+    }
 
     public String getIBAN() {
         return IBAN;
