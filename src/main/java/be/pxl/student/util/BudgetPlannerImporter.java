@@ -5,7 +5,6 @@ import be.pxl.student.entity.Payment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +42,7 @@ public class BudgetPlannerImporter {
     private List<Account> createAccounts(List<String[]> lines) {
         ArrayList<Account> accountsList = new ArrayList<>();
         HashMap<String, List<Payment>> accountsMap = new HashMap<>();
+        ArrayList<Payment> payments = new ArrayList<>();
 
         //formatter aanmaken
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
@@ -60,14 +60,13 @@ public class BudgetPlannerImporter {
             String currency = line[5];
             String detail = line[6];
 
-            ArrayList<Payment> payments = new ArrayList<>();
-            Payment payment = new Payment(dateTime, amount, currency, detail);
-            payments.add(payment);
             if (accountsMap.get(key) == null) {
                 Account account = new Account(name, key, payments);
                 accountsList.add(account);
                 accountsMap.put(key, payments);
             }
+            Payment payment = new Payment(dateTime, amount, currency, detail);
+            payments.add(payment);
         });
         return accountsList;
     }

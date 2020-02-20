@@ -1,6 +1,7 @@
 package be.pxl.student;
 
 import be.pxl.student.entity.Account;
+import be.pxl.student.entity.Payment;
 import be.pxl.student.util.BudgetPlannerFeeder;
 import be.pxl.student.util.BudgetPlannerImporter;
 
@@ -17,7 +18,13 @@ import java.util.List;
 public class BudgetPlanner {
     public static void main(String[] args) {
         BudgetPlannerImporter importer = new BudgetPlannerImporter("account_payments.csv");
-        System.out.println(importer.readFile());
+        List<Account> accounts = importer.readFile();
+        for(Account a : accounts){
+            System.out.println(a.getName()+" "+a.getIBAN());
+            for(Payment p : a.getPayments()){
+                System.out.println(p.toString());
+            }
+        }
 
 
     }
