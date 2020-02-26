@@ -61,7 +61,7 @@ public class BudgetPlannerImporter {
             String detail = line[6];
 
             if (accountsMap.get(key) == null) {
-                Account account = new Account(name, key, payments);
+                Account account = new Account(key, name, payments);
                 accountsList.add(account);
                 accountsMap.put(key, payments);
             }

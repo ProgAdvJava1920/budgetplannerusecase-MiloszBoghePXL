@@ -20,7 +20,7 @@ public class BudgetPlanner {
         BudgetPlannerImporter importer = new BudgetPlannerImporter("account_payments.csv");
         List<Account> accounts = importer.readFile();
         for(Account a : accounts){
-            System.out.println(a.getName()+" "+a.getIBAN());
+            System.out.println(a.toString());
             for(Payment p : a.getPayments()){
                 System.out.println(p.toString());
             }

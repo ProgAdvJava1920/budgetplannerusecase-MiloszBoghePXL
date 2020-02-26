@@ -50,11 +50,9 @@ public class Payment {
 
     @Override
     public String toString() {
-        return "{" +
-                "date=" + date +
-                ", amount=" + amount +
-                ", currency='" + currency + '\'' +
-                ", detail='" + detail + '\'' +
-                '}';
+        return "Date: " + '\'' + date + '\'' +
+                ", amount: " + '\'' + amount + '\'' +
+                ", currency: '" + '\'' + currency + '\'' +
+                ", detail: '" + '\'' + detail + '\'';
     }
 }
