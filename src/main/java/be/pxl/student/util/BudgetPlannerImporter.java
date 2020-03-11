@@ -16,12 +16,13 @@ import java.util.stream.Collectors;
 
 public class BudgetPlannerImporter {
     private Path path;
+
     public BudgetPlannerImporter() {
-        this.path=Paths.get(System.getProperty("user.dir")).resolve("src/main/resources/");
+        this.path = Paths.get(System.getProperty("user.dir")).resolve("src/main/resources/");
     }
 
     public List<Account> readFile(String fileName) {
-        this.path=path.resolve(fileName);
+        this.path = path.resolve(fileName);
         ArrayList<String[]> lines = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line = null;
@@ -41,14 +42,9 @@ public class BudgetPlannerImporter {
         HashMap<String, List<Payment>> accountsMap = new HashMap<>();
         ArrayList<Payment> payments = new ArrayList<>();
 
-        //formatter aanmaken
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
-
-        //Zorg dat alle foutieve lijnen weg zijn:
         lines = lines.stream().filter(line -> line.length == 7).collect(Collectors.toList());
 
-        //Maak al de accounts aan en zet ze in de lijst
-        //Account name,Account IBAN,Counteraccount IBAN,Transaction date,Amount,Currency,Detail
         lines.forEach(line -> {
             String name = line[0];
             String key = line[1];
