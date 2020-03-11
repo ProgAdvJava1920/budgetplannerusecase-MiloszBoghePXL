@@ -14,17 +14,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Util class to import csv file
- */
 public class BudgetPlannerImporter {
     private Path path;
-
-    public BudgetPlannerImporter(String fileName) {
-        this.path=Paths.get(System.getProperty("user.dir")).resolve("src/main/resources/"+fileName);
+    public BudgetPlannerImporter() {
+        this.path=Paths.get(System.getProperty("user.dir")).resolve("src/main/resources/");
     }
 
-    public List<Account> readFile() {
+    public List<Account> readFile(String fileName) {
+        this.path=path.resolve(fileName);
         ArrayList<String[]> lines = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line = null;
