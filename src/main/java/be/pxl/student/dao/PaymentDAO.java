@@ -30,11 +30,12 @@ public class PaymentDAO {
     public Payment createPayment(Payment payment) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setDate(1, payment.getDate());
-            stmt.setFloat(1, payment.getAmount());
-            stmt.setString(1, payment.getCurrency());
-            stmt.setString(1, payment.getDetail());
-            stmt.setInt(1, payment.getAccountId());
-            stmt.setInt(1, payment.getCounterAccountId());
+            stmt.setFloat(2, payment.getAmount());
+            stmt.setString(3, payment.getCurrency());
+            stmt.setString(4, payment.getDetail());
+            stmt.setInt(5, payment.getAccountId());
+            stmt.setInt(6, payment.getCounterAccountId());
+            stmt.setInt(7, payment.getId());
             if (stmt.executeUpdate() == 1) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -51,9 +52,13 @@ public class PaymentDAO {
 
     public boolean updatePayment(Payment payment) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(UPDATE)) {
-            stmt.setString(1, payment.getName());
-            stmt.setString(2, payment.getIBAN());
-            stmt.setInt(3, payment.getId());
+            stmt.setDate(1, payment.getDate());
+            stmt.setFloat(2, payment.getAmount());
+            stmt.setString(3, payment.getCurrency());
+            stmt.setString(4, payment.getDetail());
+            stmt.setInt(5, payment.getAccountId());
+            stmt.setInt(6, payment.getCounterAccountId());
+            stmt.setInt(7, payment.getId());
             return stmt.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();

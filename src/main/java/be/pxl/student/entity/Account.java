@@ -2,7 +2,6 @@ package be.pxl.student.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Account {
 
@@ -12,7 +11,13 @@ public class Account {
     private List<Payment> payments;
 
     public Account() {
-        
+
+    }
+
+    public Account(String iban) {
+        setName("Unknown");
+        setIBAN(iban);
+        this.payments = new ArrayList<>();
     }
 
     public Account(String IBAN, String name, List<Payment> payments) {
@@ -53,7 +58,7 @@ public class Account {
     }
 
     public void setId(int id) {
-        this.id=id;
+        this.id = id;
     }
 
     public int getId() {
