@@ -7,13 +7,11 @@ public class Label {
     private int id;
     private String name;
     private String description;
-    private List<Payment> payments;
 
     public Label(int id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.payments = new ArrayList<>();
     }
 
     public int getId() {
@@ -40,11 +38,4 @@ public class Label {
         this.description = description;
     }
 
-    public List<Payment> getPayments() {
-        return payments;
-    }
-
-    public void setPayment(List<Payment> payments) {
-        this.payments = payments;
-    }
 }

@@ -1,6 +1,7 @@
 package be.pxl.student;
 
 import be.pxl.student.dao.AccountDAO;
+import be.pxl.student.dao.PaymentDAO;
 import be.pxl.student.entity.Account;
 import be.pxl.student.entity.Payment;
 import be.pxl.student.util.BudgetPlannerImporter;
@@ -15,12 +16,18 @@ public class BudgetPlanner {
         Logger log = LogManager.getLogger(BudgetPlannerImporter.class);
         List<Account> accounts = importer.readFile("account_payments.csv");
         AccountDAO accountDAO = new AccountDAO("jdbc:mysql://localhost:3306/budgetplanner", "root", "admin");
+        PaymentDAO paymentDAO = new PaymentDAO("jdbc:mysql://localhost:3306/budgetplanner", "root", "admin");
+
         accountDAO.deleteAllAccounts();
+        paymentDAO.deleteAllPayments();
+
         for (Account account : accounts) {
-            accountDAO.createAccount(account);
+            account.setId(accountDAO.createAccount(account).getId());
             log.error( account.toString());
-            for (Payment p : account.getPayments()) {
-                log.error(p.toString());
+            for (Payment payment : account.getPayments()) {
+                payment.setAccountId(account.getId());
+                paymentDAO.createPayment(payment);
+                log.error(payment.toString());
             }
         }
     }

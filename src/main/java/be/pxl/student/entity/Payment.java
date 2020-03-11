@@ -1,14 +1,14 @@
 package be.pxl.student.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class Payment {
 
     private int id;
     private int accountId;
     private int counterAccountId;
-    private Date date;
-    private float amount;
+    private LocalDateTime date;
+    private double amount;
     private String currency;
     private String detail;
 
@@ -16,7 +16,7 @@ public class Payment {
 
     }
 
-    public Payment(Date date, float amount, String currency, String detail) {
+    public Payment(LocalDateTime date, double amount, String currency, String detail) {
         this.date = date;
         this.amount = amount;
         this.currency = currency;
@@ -47,19 +47,19 @@ public class Payment {
         this.counterAccountId = counterAccountId;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
-    public float getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(float amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

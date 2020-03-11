@@ -12,6 +12,7 @@ import java.util.List;
 public class PaymentDAO {
     private Logger log = LogManager.getLogger(BudgetPlannerImporter.class);
     private static final String SELECT_BY_ID = "SELECT * FROM Payment WHERE id = ?";
+    private static final String SELECT_ALL_WITH_IBAN = "SELECT * FROM Payment WHERE iban = ?";
     private static final String SELECT_ALL = "SELECT * FROM Payment";
     private static final String UPDATE = "UPDATE Payment SET date = ?, amount = ?, currency = ?, detail = ?, accountId = ?, counterAccountId = ? WHERE id = ?";
     private static final String INSERT = "INSERT INTO Payment (date, amount,currency,detail,accountId,counterAccountId) VALUES (?, ?, ?, ?, ?, ?)";
@@ -26,16 +27,10 @@ public class PaymentDAO {
         this.password = password;
     }
 
-
+    //region Create
     public Payment createPayment(Payment payment) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setDate(1, payment.getDate());
-            stmt.setFloat(2, payment.getAmount());
-            stmt.setString(3, payment.getCurrency());
-            stmt.setString(4, payment.getDetail());
-            stmt.setInt(5, payment.getAccountId());
-            stmt.setInt(6, payment.getCounterAccountId());
-            stmt.setInt(7, payment.getId());
+            fillStatement(payment, stmt);
             if (stmt.executeUpdate() == 1) {
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -50,15 +45,12 @@ public class PaymentDAO {
         return null;
     }
 
+    //endregion
+
+    //region Update
     public boolean updatePayment(Payment payment) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(UPDATE)) {
-            stmt.setDate(1, payment.getDate());
-            stmt.setFloat(2, payment.getAmount());
-            stmt.setString(3, payment.getCurrency());
-            stmt.setString(4, payment.getDetail());
-            stmt.setInt(5, payment.getAccountId());
-            stmt.setInt(6, payment.getCounterAccountId());
-            stmt.setInt(7, payment.getId());
+            fillStatement(payment, stmt);
             return stmt.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -66,6 +58,9 @@ public class PaymentDAO {
         return false;
     }
 
+    //endregion
+
+    //region Delete methods
     public void deletePayment(int id) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
             stmt.setInt(1, id);
@@ -75,11 +70,65 @@ public class PaymentDAO {
         }
     }
 
+
+
+    public void deleteAllPayments() {
+        List<Payment> payments = getAllPayments();
+        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
+            for (Payment payment : payments) {
+                stmt.setInt(1, payment.getId());
+                stmt.execute();
+            }
+        } catch (SQLException | NullPointerException ex) {
+            log.error(ex.getMessage());
+        }
+    }
+    //endregion
+
+    //region get Methods
+    private List<Payment> getAllPayments() {
+        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(SELECT_ALL)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapPayments(rs);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Payment> getAllPaymentsWithIban(String iban) {
+        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(SELECT_ALL_WITH_IBAN)) {
+            stmt.setString(1, iban);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapPayments(rs);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    //endregion
+
+    //region private methods (fill, map, connection)
+    private void fillStatement(Payment payment, PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, Timestamp.valueOf(payment.getDate()));
+        stmt.setDouble(2, payment.getAmount());
+        stmt.setString(3, payment.getCurrency());
+        stmt.setString(4, payment.getDetail());
+        stmt.setInt(5, payment.getAccountId());
+        stmt.setInt(6, payment.getCounterAccountId());
+        stmt.setInt(7, payment.getId());
+    }
+
     private Payment mapPayment(ResultSet rs) throws SQLException {
         Payment payment = new Payment();
         payment.setId(rs.getInt("id"));
-        payment.setDate(rs.getDate("date"));
-        payment.setAmount(rs.getFloat("amount"));
+        payment.setDate(rs.getTimestamp("date").toLocalDateTime());
+        payment.setAmount(rs.getDouble("amount"));
         payment.setCurrency(rs.getString("currency"));
         payment.setDetail(rs.getString("detail"));
         payment.setAccountId(rs.getInt("accountId"));
@@ -104,4 +153,5 @@ public class PaymentDAO {
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
+    //endregion
 }

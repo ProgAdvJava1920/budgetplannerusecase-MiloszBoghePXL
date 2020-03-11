@@ -14,7 +14,7 @@ public class AccountDAO {
     private static final String SELECT_BY_ID = "SELECT * FROM Account WHERE id = ?";
     private static final String SELECT_BY_IBAN = "SELECT * FROM Account WHERE IBAN = ?";
     private static final String SELECT_ALL = "SELECT * FROM Account order by id desc";
-    private static final String UPDATE = "UPDATE Account SET name=?, IBAN=? WHERE id = ?";
+    private static final String UPDATE = "UPDATE Account SET name=? WHERE IBAN = ?";
     private static final String INSERT = "INSERT INTO Account (name, IBAN) VALUES (?, ?)";
     private static final String DELETE = "DELETE FROM Account WHERE id = ?";
     private String url;
@@ -27,7 +27,7 @@ public class AccountDAO {
         this.password = password;
     }
 
-
+    //region Create
     public Account createAccount(Account account) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, account.getName());
@@ -49,19 +49,21 @@ public class AccountDAO {
         }
         return null;
     }
+    //endregion
 
-    public boolean updateAccount(Account account) {
+    //region Update
+    public void updateAccount(Account account) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(UPDATE)) {
             stmt.setString(1, account.getName());
             stmt.setString(2, account.getIBAN());
-            stmt.setInt(3, account.getId());
-            return stmt.execute();
+            stmt.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return false;
     }
+    //endregion
 
+    //region Delete Methods
     public void deleteAccount(int id) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
             stmt.setInt(1, id);
@@ -71,6 +73,21 @@ public class AccountDAO {
         }
     }
 
+    public void deleteAllAccounts() {
+        List<Account> accounts = getAllAccounts();
+        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
+            for (Account acc : accounts) {
+                stmt.setInt(1, acc.getId());
+                stmt.execute();
+            }
+        } catch (SQLException | NullPointerException ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
+    //endregion
+
+    //region getMethods
     public List<Account> getAllAccounts() {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(SELECT_ALL)) {
             ResultSet rs = stmt.executeQuery();
@@ -109,31 +126,9 @@ public class AccountDAO {
         }
         return null;
     }
+    //endregion
 
-    public void deleteAllAccounts() {
-        List<Account> accounts = getAllAccounts();
-        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
-            for (Account acc : accounts) {
-                stmt.setInt(1, acc.getId());
-                stmt.execute();
-            }
-        } catch (SQLException | NullPointerException ex) {
-            log.error(ex.getMessage());
-        }
-    }
-
-    public int getMaxId() {
-        try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(SELECT_ALL)) {
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return mapAccount(rs).getId();
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return 0;
-    }
-
+    //region Private methods(mapAccount, connection)
     private Account mapAccount(ResultSet rs) throws SQLException {
         Account account = new Account();
         account.setName(rs.getString("name"));
@@ -159,4 +154,6 @@ public class AccountDAO {
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
+//endregion
+
 }

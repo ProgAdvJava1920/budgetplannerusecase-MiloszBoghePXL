@@ -9,9 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class BudgetPlannerImporter {
@@ -25,7 +27,7 @@ public class BudgetPlannerImporter {
         this.path = path.resolve(fileName);
         ArrayList<String[]> lines = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String line = null;
+            String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 lines.add(line.split(","));
@@ -45,22 +47,33 @@ public class BudgetPlannerImporter {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
         lines = lines.stream().filter(line -> line.length == 7).collect(Collectors.toList());
 
+        //Account name,Account IBAN,Counteraccount IBAN,Transaction date,Amount,Currency,Detail
         lines.forEach(line -> {
             String name = line[0];
-            String key = line[1];
-            Date dateTime = Date.from(LocalDateTime.parse(line[3], formatter).toInstant(ZoneOffset.UTC));
-            float amount = Float.parseFloat(line[4]);
+            String fromIban = line[1];
+            String toIban = line[2];
+            LocalDateTime dateTime = LocalDateTime.parse(line[3], formatter);
+            double amount = Double.parseDouble(line[4]);
             String currency = line[5];
             String detail = line[6];
 
-            if (accountsMap.get(key) == null) {
-                Account account = new Account(key, name, payments);
-                accountsList.add(account);
-                accountsMap.put(key, payments);
+            if (accountsMap.get(fromIban) == null) {
+                createAccount(accountsList, accountsMap, payments, name, fromIban);
             }
+
+            if (accountsMap.get(toIban) == null) {
+                createAccount(accountsList, accountsMap, new ArrayList<>(), "Unknown", toIban);
+            }
+
             Payment payment = new Payment(dateTime, amount, currency, detail);
             payments.add(payment);
         });
         return accountsList;
+    }
+
+    private void createAccount(ArrayList<Account> accountsList, HashMap<String, List<Payment>> accountsMap, ArrayList<Payment> payments, String name, String fromIban) {
+        Account account = new Account(fromIban, name, payments);
+        accountsList.add(account);
+        accountsMap.put(fromIban, payments);
     }
 }
