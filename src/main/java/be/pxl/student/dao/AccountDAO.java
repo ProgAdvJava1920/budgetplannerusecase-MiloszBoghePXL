@@ -62,14 +62,13 @@ public class AccountDAO {
         return false;
     }
 
-    public boolean deleteAccount(int id) {
+    public void deleteAccount(int id) {
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
             stmt.setInt(1, id);
-            return stmt.execute();
+            stmt.execute();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return false;
     }
 
     public List<Account> getAllAccounts() {
@@ -111,7 +110,7 @@ public class AccountDAO {
         return null;
     }
 
-    public boolean deleteAllAccounts() {
+    public void deleteAllAccounts() {
         List<Account> accounts = getAllAccounts();
         try (Connection connection = getConnection(); PreparedStatement stmt = connection.prepareStatement(DELETE)) {
             for (Account acc : accounts) {
@@ -121,7 +120,6 @@ public class AccountDAO {
         } catch (SQLException | NullPointerException ex) {
             log.error(ex.getMessage());
         }
-        return false;
     }
 
     public int getMaxId() {

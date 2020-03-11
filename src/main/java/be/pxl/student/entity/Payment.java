@@ -4,16 +4,47 @@ import java.util.Date;
 
 public class Payment {
 
+    private int id;
+    private int accountId;
+    private int counterAccountId;
     private Date date;
     private float amount;
     private String currency;
     private String detail;
+
+    public Payment() {
+
+    }
 
     public Payment(Date date, float amount, String currency, String detail) {
         this.date = date;
         this.amount = amount;
         this.currency = currency;
         this.detail = detail;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
+    }
+
+    public int getCounterAccountId() {
+        return counterAccountId;
+    }
+
+    public void setCounterAccountId(int counterAccountId) {
+        this.counterAccountId = counterAccountId;
     }
 
     public Date getDate() {
